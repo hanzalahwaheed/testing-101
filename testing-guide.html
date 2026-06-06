@@ -1,0 +1,1842 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Testing Guide for Interviews</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --paper: #fffdf7;
+        --ink: #191713;
+        --muted: #655f54;
+        --line: #d8d0c2;
+        --code-bg: #20201d;
+        --code-ink: #f6f1e4;
+        --accent: #0d6b5f;
+        --accent-2: #b4492d;
+        --accent-soft: #e5f0ec;
+        --warn-soft: #f7e5da;
+        --ok-soft: #e7efda;
+        --shadow: 0 18px 60px rgba(48, 39, 25, 0.13);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background:
+          linear-gradient(90deg, rgba(25, 23, 19, 0.045) 1px, transparent 1px),
+          linear-gradient(rgba(25, 23, 19, 0.035) 1px, transparent 1px),
+          var(--bg);
+        background-size: 34px 34px;
+        color: var(--ink);
+        font-family: ui-serif, Georgia, "Times New Roman", serif;
+        line-height: 1.58;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration-thickness: 0.09em;
+        text-underline-offset: 0.18em;
+      }
+
+      code,
+      pre,
+      kbd {
+        font-family:
+          "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      }
+
+      .shell {
+        min-height: 100vh;
+      }
+
+      .hero {
+        padding: 56px 24px 34px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 253, 247, 0.78);
+        backdrop-filter: blur(10px);
+      }
+
+      .hero-inner,
+      .layout {
+        width: min(1180px, calc(100vw - 48px));
+        margin: 0 auto;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--accent);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 0.78rem;
+        font-weight: 760;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 34px;
+        height: 2px;
+        background: var(--accent);
+      }
+
+      h1 {
+        max-width: 920px;
+        margin: 20px 0 18px;
+        font-size: clamp(2.6rem, 7vw, 6.6rem);
+        line-height: 0.93;
+        letter-spacing: 0;
+      }
+
+      .dek {
+        max-width: 760px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.18rem;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 34px;
+        padding: 34px 0 80px;
+      }
+
+      .toc {
+        position: sticky;
+        top: 20px;
+        align-self: start;
+        padding: 18px;
+        background: rgba(255, 253, 247, 0.92);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      .toc strong {
+        display: block;
+        margin-bottom: 10px;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 0.8rem;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+
+      .toc a {
+        display: block;
+        padding: 7px 0;
+        color: var(--muted);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 0.94rem;
+        text-decoration: none;
+      }
+
+      .toc a:hover {
+        color: var(--accent);
+      }
+
+      main {
+        min-width: 0;
+      }
+
+      section {
+        margin-bottom: 28px;
+        padding: 28px;
+        background: rgba(255, 253, 247, 0.95);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      h2 {
+        margin: 0 0 12px;
+        font-size: clamp(1.7rem, 3vw, 2.6rem);
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      h3 {
+        margin: 28px 0 10px;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 1.04rem;
+        line-height: 1.3;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      ul,
+      ol {
+        margin: 0 0 16px;
+        padding-left: 23px;
+      }
+
+      li + li {
+        margin-top: 7px;
+      }
+
+      .note,
+      .warning,
+      .rule {
+        margin: 18px 0;
+        padding: 16px 18px;
+        border-left: 5px solid var(--accent);
+        background: var(--accent-soft);
+      }
+
+      .warning {
+        border-left-color: var(--accent-2);
+        background: var(--warn-soft);
+      }
+
+      .rule {
+        border-left-color: #75812f;
+        background: var(--ok-soft);
+      }
+
+      .label {
+        display: inline-block;
+        margin-bottom: 8px;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 0.74rem;
+        font-weight: 760;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+
+      pre {
+        overflow-x: auto;
+        margin: 14px 0 18px;
+        padding: 18px;
+        border-radius: 0;
+        background: var(--code-bg);
+        color: var(--code-ink);
+        font-size: 0.9rem;
+        line-height: 1.55;
+      }
+
+      :not(pre) > code {
+        padding: 0.12em 0.32em;
+        border: 1px solid rgba(13, 107, 95, 0.2);
+        background: rgba(13, 107, 95, 0.08);
+        color: #0a534a;
+        font-size: 0.92em;
+      }
+
+      table {
+        width: 100%;
+        margin: 18px 0;
+        border-collapse: collapse;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 0.94rem;
+      }
+
+      th,
+      td {
+        padding: 11px 12px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #ece5d8;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .mini-card {
+        padding: 16px;
+        border: 1px solid var(--line);
+        background: #fbf8ef;
+      }
+
+      .mini-card h3 {
+        margin-top: 0;
+      }
+
+      .callout-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .tile {
+        min-height: 120px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        background: #f4efe4;
+      }
+
+      .tile strong {
+        display: block;
+        margin-bottom: 8px;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .footer {
+        color: var(--muted);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .toc {
+          position: static;
+        }
+
+        .two-col,
+        .callout-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media print {
+        body {
+          background: white;
+        }
+
+        .hero,
+        section,
+        .toc {
+          box-shadow: none;
+          background: white;
+        }
+
+        .toc {
+          display: none;
+        }
+
+        .layout {
+          display: block;
+          width: auto;
+          padding: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="hero">
+        <div class="hero-inner">
+          <div class="eyebrow">Testing interview field guide</div>
+          <h1>Testing, from zero</h1>
+          <p class="dek">
+            A plain-English introduction to automated testing &mdash; what it is,
+            the kinds of tests, why different parts of the code are tested
+            differently, and exactly how backend and frontend tests usually work
+            in a full-stack application. No prior testing knowledge assumed.
+          </p>
+        </div>
+      </header>
+
+      <div class="layout">
+        <nav class="toc" aria-label="Table of contents">
+          <strong>Contents</strong>
+          <a href="#why">1. Why We Test</a>
+          <a href="#kinds">2. The Kinds of Tests</a>
+          <a href="#pyramid">3. The Test Pyramid</a>
+          <a href="#strategy">4. Choosing the Right Test</a>
+          <a href="#stack">5. A Common Testing Stack</a>
+          <a href="#anatomy">6. Anatomy of a Test</a>
+          <a href="#fixtures">7. Fixtures</a>
+          <a href="#approaches">8. Different Things, Different Tests</a>
+          <a href="#frontend">9. Frontend Component Tests</a>
+          <a href="#industry">10. Industry-Standard Examples</a>
+          <a href="#thinking">11. The Thought Process</a>
+          <a href="#running">12. Running the Tests</a>
+          <a href="#cheatsheet">13. Glossary &amp; Cheatsheet</a>
+        </nav>
+
+        <main>
+          <section id="why">
+            <h2>1. Why We Test</h2>
+            <p>
+              A <strong>test</strong> is just code that checks other code. You
+              write a small program that runs your real function, then asserts
+              &mdash; "the answer should be X". If it is, the test passes. If it
+              is not, the test fails loudly and tells you where.
+            </p>
+            <p>
+              That sounds simple, and it is. The value is not in any single
+              test &mdash; it is in having hundreds of them that run in seconds.
+              Concretely, tests buy you:
+            </p>
+            <ul>
+              <li>
+                <strong>A safety net.</strong> You change one function and run
+                the suite. If you accidentally broke something three files away,
+                a test goes red immediately &mdash; not next week in production.
+                A bug caught by an old test coming back is called a
+                <strong>regression</strong>.
+              </li>
+              <li>
+                <strong>Confidence to change things.</strong> Without tests,
+                every edit is a gamble and you end up afraid of your own code.
+                With tests, you can refactor freely: if the suite is still
+                green, behaviour is unchanged.
+              </li>
+              <li>
+                <strong>Executable documentation.</strong> A test literally
+                shows how a function is meant to be called and what it returns.
+                It cannot go stale the way a comment can &mdash; if it lies, it
+                fails.
+              </li>
+              <li>
+                <strong>A design check.</strong> Code that is painful to test is
+                usually painful to use. If a test needs ten lines of setup, the
+                function probably does too much.
+              </li>
+            </ul>
+            <div class="note">
+              <span class="label">Mindset</span>
+              You are not testing to prove the code works. You are testing to
+              find out where it <em>doesn't</em>. A test that never fails taught
+              you nothing; a test that catches a real mistake just paid for
+              itself.
+            </div>
+          </section>
+
+          <section id="kinds">
+            <h2>2. The Kinds of Tests</h2>
+            <p>
+              "Testing" is not one activity. Tests are categorised mostly by
+              <strong>how much of the system they exercise at once</strong>. The
+              three you must know:
+            </p>
+
+            <h3>Unit test</h3>
+            <p>
+              Tests <strong>one small piece in isolation</strong> &mdash;
+              usually a single function &mdash; with no database, no network, no
+              web server. You hand it inputs, you check its output. Unit tests
+              are tiny and run in milliseconds.
+            </p>
+            <p>
+              In a data app, transformation functions are often pure logic:
+              give them a table, they return a new table. Perfect unit-test
+              material &mdash; for example
+              <code>tests/test_transformations.py</code>.
+            </p>
+
+            <h3>Integration test</h3>
+            <p>
+              Tests <strong>several pieces working together</strong> &mdash; for
+              example an API endpoint <em>plus</em> the database <em>plus</em>
+              the service layer, all in one go. Slower than unit tests (there is
+              real wiring involved) but they catch a whole class of bugs unit
+              tests cannot: mismatches <em>between</em> components.
+            </p>
+            <p>
+              Most of <code>tests/test_auth.py</code> is integration testing: it
+              sends a real HTTP request to the sign-up endpoint and checks that
+              a user row was created and a cookie came back.
+            </p>
+
+            <h3>End-to-end test (E2E)</h3>
+            <p>
+              Tests the <strong>whole system the way a user would</strong>
+              &mdash; e.g. a browser clicking through the real frontend, which
+              calls the real backend, which hits a real database. The most
+              realistic, but also the slowest and most fragile.
+            </p>
+            <div class="note">
+              <span class="label">Typical E2E shape</span>
+              A typical full-stack app might keep Playwright E2E tests under
+              <code>e2e/</code>. They drive the real frontend, backend, and a
+              real database. Treat them as high-value journey tests, not as the
+              place to check every tiny rule.
+            </div>
+
+            <p>Beyond that "how much" axis, a few named tests describe <em>purpose</em>:</p>
+            <table>
+              <thead>
+                <tr><th>Name</th><th>What it is</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Regression test</strong></td>
+                  <td>A test written specifically to lock in a bug fix so the
+                  bug can never silently return.</td>
+                  <td><code>test_save_project.py</code> &mdash; proves a save
+                  never corrupts the original uploaded file.</td>
+                </tr>
+                <tr>
+                  <td><strong>Smoke test</strong></td>
+                  <td>A quick, shallow "does it even start / respond at all"
+                  check.</td>
+                  <td>e.g. asserting <code>GET /projects/recent</code> returns
+                  <code>200</code> for a logged-in user.</td>
+                </tr>
+                <tr>
+                  <td><strong>Happy-path test</strong></td>
+                  <td>The everything-went-right case &mdash; valid input,
+                  expected output.</td>
+                  <td><code>test_signup_success_sets_cookie</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>Edge / failure test</strong></td>
+                  <td>Deliberately wrong or extreme input &mdash; you assert it
+                  fails <em>correctly</em>.</td>
+                  <td><code>test_signup_duplicate_email_returns_409</code>,
+                  <code>test_signup_long_password_returns_422</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              These are not separate categories &mdash; a regression test is
+              usually <em>also</em> a unit or integration test. "Regression" just
+              says <em>why</em> it exists.
+            </p>
+          </section>
+
+          <section id="pyramid">
+            <h2>3. The Test Pyramid</h2>
+            <p>
+              How many of each kind should you write? The classic guideline is
+              the <strong>test pyramid</strong>: lots of fast unit tests at the
+              base, fewer integration tests in the middle, a handful of slow E2E
+              tests at the top.
+            </p>
+
+            <div class="callout-grid">
+              <div class="tile">
+                <strong>Top &mdash; E2E (few)</strong>
+                Slow, realistic, fragile. A few to confirm the whole system
+                hangs together.
+              </div>
+              <div class="tile">
+                <strong>Middle &mdash; Integration (some)</strong>
+                Endpoints + DB + services. Catches wiring bugs. Moderately fast.
+              </div>
+              <div class="tile">
+                <strong>Base &mdash; Unit (many)</strong>
+                One function each. Milliseconds. This is where most of your
+                tests live.
+              </div>
+            </div>
+
+            <p>The reasoning is purely practical:</p>
+            <ul>
+              <li>
+                <strong>Speed.</strong> You run the suite constantly. Unit tests
+                keep it fast enough to run on every save.
+              </li>
+              <li>
+                <strong>Precision.</strong> When a unit test fails, you know
+                exactly which function broke. When an E2E test fails, the cause
+                could be anywhere.
+              </li>
+              <li>
+                <strong>Stability.</strong> E2E tests break for boring reasons
+                (a slow network, a renamed button). Too many and people start
+                ignoring red &mdash; the worst outcome.
+              </li>
+            </ul>
+            <div class="rule">
+              <span class="label">Rule of thumb</span>
+              If a piece of logic can be tested as a unit, test it as a unit.
+              Reach for an integration test only when the thing you care about
+              <em>is</em> the interaction between parts.
+            </div>
+          </section>
+
+          <section id="strategy">
+            <h2>4. Choosing the Right Test</h2>
+            <p>
+              A good test suite is not just "more tests". It is the right kind
+              of test for the risk you are trying to reduce. Before writing a
+              test, identify the behaviour, the user or caller who depends on
+              it, and the cheapest layer that can prove it.
+            </p>
+
+            <table>
+              <thead>
+                <tr><th>If the risk is...</th><th>Prefer...</th><th>Because...</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>A pure function returns the wrong value</td>
+                  <td>Unit test</td>
+                  <td>Fast, precise, easy to cover many cases.</td>
+                </tr>
+                <tr>
+                  <td>An API contract breaks</td>
+                  <td>Integration test</td>
+                  <td>You need the route, validation, service, auth, and database wiring.</td>
+                </tr>
+                <tr>
+                  <td>A reusable React component behaves wrong</td>
+                  <td>Component test</td>
+                  <td>You can render just that component and test visible behaviour.</td>
+                </tr>
+                <tr>
+                  <td>A full workflow breaks across screens</td>
+                  <td>E2E test</td>
+                  <td>The bug may live in routing, API calls, browser behaviour, or backend state.</td>
+                </tr>
+                <tr>
+                  <td>A layout or chart changes unexpectedly</td>
+                  <td>Visual regression test</td>
+                  <td>Normal assertions are weak at catching visual differences.</td>
+                </tr>
+                <tr>
+                  <td>A fixed bug might come back</td>
+                  <td>Regression test</td>
+                  <td>The test documents the bug and locks the fix in place.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>The cost ladder</h3>
+            <p>
+              Start with the cheapest test that proves the behaviour. Move up
+              the ladder only when a lower-level test cannot see the failure.
+            </p>
+            <ol>
+              <li><strong>Static checks</strong> &mdash; TypeScript, linting, formatting.</li>
+              <li><strong>Unit tests</strong> &mdash; pure logic, helpers, validators.</li>
+              <li><strong>Component tests</strong> &mdash; rendered UI behaviour.</li>
+              <li><strong>Integration tests</strong> &mdash; API, DB, services, providers.</li>
+              <li><strong>E2E tests</strong> &mdash; complete user journeys in a browser.</li>
+              <li><strong>Manual checks</strong> &mdash; exploratory testing and UX judgment.</li>
+            </ol>
+
+            <div class="note">
+              <span class="label">Design pressure</span>
+              If a small behaviour can only be tested with a huge E2E test, the
+              code may be too tightly coupled. Testing pain is often architecture
+              feedback.
+            </div>
+
+            <h3>A reusable test-case template</h3>
+            <p>
+              When adding a new behaviour to this guide later, write it in this
+              shape. It keeps tests readable and makes future sections easy to
+              extend.
+            </p>
+            <pre>Behaviour: what must be true from the user's or caller's point of view
+Layer: unit | component | integration | E2E | visual
+Arrange: the smallest setup needed
+Act: the one action being tested
+Assert: the observable result
+Negative cases: what must fail cleanly
+Regression risk: any past bug this protects against</pre>
+          </section>
+
+          <section id="stack">
+            <h2>5. A Common Testing Stack</h2>
+            <p>
+              A modern full-stack app often has three active test suites: a
+              backend suite, a frontend component/unit suite, and a Playwright
+              E2E suite. They use
+              different tools, but they follow the same testing discipline:
+              small setup, one clear action, and an observable assertion.
+            </p>
+
+            <h3>Backend stack</h3>
+            <table>
+              <thead>
+                <tr><th>Piece</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>pytest</strong></td>
+                  <td>The test runner. It finds every file named
+                  <code>test_*.py</code>, runs every function named
+                  <code>test_*</code> inside, and reports pass/fail.</td>
+                </tr>
+                <tr>
+                  <td><strong>pytest-asyncio</strong></td>
+                  <td>Lets pytest run <code>async</code> test functions &mdash;
+                  needed because some backend functions are asynchronous.</td>
+                </tr>
+                <tr>
+                  <td><strong><code>assert</code></strong></td>
+                  <td>Plain Python. <code>assert x == y</code> &mdash; if the
+                  condition is false, the test fails. No special library.</td>
+                </tr>
+                <tr>
+                  <td><strong>TestClient</strong></td>
+                  <td>From FastAPI/Starlette. A fake HTTP client that calls your
+                  app in-process &mdash; real requests and responses, no real
+                  network, no running server.</td>
+                </tr>
+                <tr>
+                  <td><strong>SQLite test database</strong></td>
+                  <td>Tests do not touch the real Postgres database. They use a
+                  throwaway SQLite database that is created empty and destroyed
+                  after each test.</td>
+                </tr>
+                <tr>
+                  <td><strong><code>tests/conftest.py</code></strong></td>
+                  <td>A special pytest file holding shared <em>fixtures</em>
+                  (reusable setup &mdash; see section 7).</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Frontend stack</h3>
+            <table>
+              <thead>
+                <tr><th>Piece</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Vitest</strong></td>
+                  <td>Runs JavaScript, TypeScript, and React tests. A common
+                  frontend script is <code>npm run test</code>, which runs
+                  <code>vitest run</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>React Testing Library</strong></td>
+                  <td>Renders React components and lets tests query the DOM by
+                  roles, labels, text, and other user-facing signals.</td>
+                </tr>
+                <tr>
+                  <td><strong>user-event</strong></td>
+                  <td>Simulates realistic user actions such as typing, clicking,
+                  keyboard input, and selection.</td>
+                </tr>
+                <tr>
+                  <td><strong>jsdom</strong></td>
+                  <td>Provides a browser-like DOM inside Node so component tests
+                  can run without opening a real browser.</td>
+                </tr>
+                <tr>
+                  <td><strong>jest-dom</strong></td>
+                  <td>Adds readable DOM assertions such as
+                  <code>toBeInTheDocument()</code>, <code>toBeVisible()</code>,
+                  and <code>toBeDisabled()</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>E2E stack</h3>
+            <table>
+              <thead>
+                <tr><th>Piece</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Playwright</strong></td>
+                  <td>Runs browser tests against the real app. A common root
+                  script is <code>npm run test:e2e</code>, which runs
+                  <code>playwright test</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong><code>playwright.config.js</code></strong></td>
+                  <td>Defines the E2E test directory, browser project, base URL,
+                  timeouts, global setup, and the backend/frontend dev servers
+                  Playwright starts before tests run.</td>
+                </tr>
+                <tr>
+                  <td><strong><code>e2e/fixtures.js</code></strong></td>
+                  <td>Shared E2E setup. Fixtures can create a project, sign in,
+                  upload a sample CSV, and pass useful values such as
+                  <code>projectId</code> into a test.</td>
+                </tr>
+                <tr>
+                  <td><strong><code>data-testid</code></strong></td>
+                  <td>A stable selector used when a control has no good
+                  accessible role/name or when visible text is likely to change.
+                  Prefer role/label/text first when they are clear.</td>
+                </tr>
+                <tr>
+                  <td><strong>Postgres</strong></td>
+                  <td>The E2E backend talks to a real Postgres database. Local
+                  runs need a valid <code>DATABASE_URL</code>, often
+                  <code>postgresql://postgres:postgres@localhost:5432/example_app</code>
+                  when using a local Docker Compose database.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Where backend tests live</h3>
+            <p>
+              Backend tests usually live under <code>backend/tests/</code>, with
+              one file roughly per area of the app:
+            </p>
+            <ul>
+              <li><code>test_transformations.py</code> &mdash; unit tests for the data-transformation logic.</li>
+              <li><code>test_auth.py</code> &mdash; integration tests for sign-up, sign-in, logout, protected routes.</li>
+              <li><code>test_new_features.py</code> &mdash; a mix: unit tests for transforms, integration tests for project endpoints.</li>
+              <li><code>test_save_revert.py</code>, <code>test_user_logs.py</code> &mdash; service- and endpoint-level tests for saving and history.</li>
+              <li><code>test_save_project.py</code> &mdash; a regression test guarding the original file.</li>
+              <li><code>test_upload.py</code> &mdash; unit tests for upload-file validation.</li>
+              <li><code>conftest.py</code> &mdash; shared fixtures, not tests themselves.</li>
+            </ul>
+
+            <h3>Where frontend tests live</h3>
+            <p>
+              Frontend tests live next to the code they protect, usually inside
+              <code>__tests__/</code> folders under
+              <code>frontend/src/</code>. Examples include:
+            </p>
+            <ul>
+              <li><code>src/Components/common/__tests__/Button.test.jsx</code> &mdash; reusable button behaviour.</li>
+              <li><code>src/Components/common/__tests__/Modal.test.jsx</code> &mdash; modal visibility, accessibility, and close interactions.</li>
+              <li><code>src/api/__tests__/client.test.js</code> &mdash; API client behaviour.</li>
+              <li><code>src/hooks/__tests__/useForm.test.ts</code> &mdash; custom hook state and validation behaviour.</li>
+            </ul>
+
+            <h3>Where E2E tests live</h3>
+            <p>
+              E2E tests live in the root <code>e2e/</code> directory. Each file
+              is a user-facing area or journey:
+            </p>
+            <ul>
+              <li><code>auth.spec.js</code> &mdash; sign-in and sign-up screens.</li>
+              <li><code>project-crud.spec.js</code> &mdash; create, open, list, and delete projects.</li>
+              <li><code>table-operations.spec.js</code> &mdash; editing, context menus, rows, and columns.</li>
+              <li><code>transformations.spec.js</code> &mdash; browser-level transform flows.</li>
+              <li><code>checkpoints.spec.js</code> &mdash; save and revert checkpoint journeys.</li>
+              <li><code>export.spec.js</code> &mdash; export modal and downloaded file checks.</li>
+              <li><code>fixtures/</code> &mdash; sample files used by tests.</li>
+            </ul>
+
+            <div class="note">
+              <span class="label">Why SQLite for backend tests</span>
+              The real app runs on Postgres. Tests use SQLite because it needs
+              no server, starts instantly, and can be created fresh and thrown
+              away per test &mdash; giving every test a clean, isolated database.
+              The trade-off: SQLite and Postgres are not identical, so a few
+              behaviours (some constraints, some SQL features) can differ. For
+              an MVP that trade-off is fine; just be aware of it. Playwright
+              E2E tests are different: they use the real backend and therefore
+              need Postgres.
+            </div>
+          </section>
+
+          <section id="anatomy">
+            <h2>6. Anatomy of a Test</h2>
+            <p>
+              Almost every good test follows the same three-beat shape, often
+              called <strong>Arrange &ndash; Act &ndash; Assert</strong>.
+            </p>
+            <ol>
+              <li><strong>Arrange</strong> &mdash; set up the inputs and the world the test needs.</li>
+              <li><strong>Act</strong> &mdash; run the one thing you are actually testing.</li>
+              <li><strong>Assert</strong> &mdash; check the result is what you expected.</li>
+            </ol>
+
+            <p>A real unit test from <code>test_transformations.py</code>:</p>
+            <pre>def test_cast_to_integer(self):
+    # Arrange: build a small input table
+    df = pd.DataFrame({"val": ["10", "20", "30"]})
+
+    # Act: run the one function under test
+    result = cast_data_type(df, "val", "integer")
+
+    # Assert: state exactly what should be true
+    assert result["val"].dtype == "Int64"
+    assert result.iloc[0]["val"] == 10</pre>
+
+            <p>And a real integration test from <code>test_auth.py</code>:</p>
+            <pre>def test_signup_success_sets_cookie(self, anon_client):
+    # Act: send a real HTTP request through the app
+    resp = anon_client.post(
+        "/auth/signup",
+        json={"email": "newuser@test.com", "password": "testpassword"},
+    )
+
+    # Assert: status code, and the auth cookie came back
+    assert resp.status_code == 201
+    assert "access_token" in resp.headers.get("set-cookie", "")</pre>
+
+            <h3>The naming convention</h3>
+            <p>
+              Test names are sentences. <code>test_signup_duplicate_email_returns_409</code>
+              tells you the scenario <em>and</em> the expected result before you
+              read a single line. When that test fails, the name alone often
+              tells you what broke. Long, descriptive names are good here &mdash;
+              this is the one place verbosity pays off.
+            </p>
+
+            <h3>Test classes</h3>
+            <p>
+              You will see tests grouped inside <code>class TestSignup:</code>,
+              <code>class TestCastDataType:</code>, and so on. That is purely
+              organisational &mdash; a folder for related tests. pytest does not
+              require classes; some projects use them to keep related cases
+              together.
+            </p>
+
+            <h3>Checking that something fails correctly</h3>
+            <p>
+              Sometimes the <em>correct</em> behaviour is to raise an error.
+              You test that with <code>pytest.raises</code> &mdash; the test
+              passes only if the expected exception is raised:
+            </p>
+            <pre>def test_non_csv_rejected(self):
+    file = MockUploadFile("data.xlsx")
+    with pytest.raises(HTTPException, match="not allowed"):
+        await validate_upload_file(file)</pre>
+            <p>
+              This asserts: "uploading a non-CSV must raise an
+              <code>HTTPException</code> whose message contains 'not allowed'".
+              If no exception is raised, the test fails &mdash; silently
+              accepting a bad file would be a bug.
+            </p>
+          </section>
+
+          <section id="fixtures">
+            <h2>7. Fixtures</h2>
+            <p>
+              Most tests need some setup before they can run: a database, a
+              logged-in user, a sample file. Copy-pasting that setup into every
+              test would be miserable. A <strong>fixture</strong> is pytest's
+              answer &mdash; a reusable, named piece of setup.
+            </p>
+            <p>
+              You define a fixture once in <code>conftest.py</code>. Any test
+              that wants it just lists its name as a function argument, and
+              pytest runs the fixture and passes the result in. That argument
+              wiring <em>is</em> the mechanism &mdash; no imports, no calls.
+            </p>
+            <pre>@pytest.fixture
+def test_user(db):
+    """Create and return a user row for tests that need an owner."""
+    user = models.User(email=TEST_USER_EMAIL, password_hash=TEST_USER_PASSWORD_HASH)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+# A test "asks for" the fixture simply by naming it:
+def test_checkpoint_message(self, db, test_user):
+    project = create_project(db, name="test", file_path="/tmp/test.csv",
+                             description="test", owner_id=test_user.id)
+    ...</pre>
+
+            <h3>Example fixtures</h3>
+            <table>
+              <thead>
+                <tr><th>Fixture</th><th>Gives the test&hellip;</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>db</code></td>
+                  <td>A database session connected to the throwaway SQLite test
+                  database.</td>
+                </tr>
+                <tr>
+                  <td><code>test_user</code></td>
+                  <td>A real user row already saved in the database &mdash; an
+                  owner for projects.</td>
+                </tr>
+                <tr>
+                  <td><code>client</code></td>
+                  <td>A <code>TestClient</code> that is <strong>already logged
+                  in</strong> as <code>test_user</code>. Use it for normal
+                  endpoint tests &mdash; the whole API requires auth.</td>
+                </tr>
+                <tr>
+                  <td><code>anon_client</code></td>
+                  <td>A <code>TestClient</code> with <strong>no login</strong>.
+                  Use it to test sign-up/sign-in, and to confirm protected
+                  routes reject anonymous callers.</td>
+                </tr>
+                <tr>
+                  <td><code>sample_csv</code></td>
+                  <td>A small CSV file on disk, ready to upload.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Two fixtures run automatically</h3>
+            <p>
+              <code>conftest.py</code> has two <code>autouse=True</code> fixtures
+              &mdash; they run for <em>every</em> test without being asked for:
+            </p>
+            <ul>
+              <li>
+                <code>setup_database</code> &mdash; creates all database tables
+                before the test and drops them after. This is what makes every
+                test <strong>isolated</strong>: each one starts with an empty
+                database and leaves nothing behind.
+              </li>
+              <li>
+                <code>_bypass_app_lifespan</code> &mdash; switches off the real
+                app's start-up steps (connecting to Postgres, running
+                migrations) which would otherwise fire when the
+                <code>TestClient</code> starts.
+              </li>
+            </ul>
+            <div class="warning">
+              <span class="label">A real test-harness gotcha</span>
+              The <code>client</code> fixture attaches the auth token as a
+              <code>Cookie</code> header rather than through the HTTP cookie jar.
+              The jar mangles cookies for dot-less hostnames (the test host
+              <code>testserver</code> becomes <code>testserver.local</code>) and
+              silently drops them &mdash; which made every authenticated test
+              fail with <code>401</code>. The lesson: when a test fails, suspect
+              the test harness, not just the code under test.
+            </div>
+          </section>
+
+          <section id="approaches">
+            <h2>8. Different Things, Different Tests</h2>
+            <p>
+              This is the part you asked about directly: different parts of the
+              code call for different testing methods. You do not test a pure
+              calculation the way you test an HTTP endpoint. Here is how to think
+              about each layer of an application.
+            </p>
+
+            <div class="two-col">
+              <div class="mini-card">
+                <h3>Pure logic &rarr; unit tests</h3>
+                <p>
+                  Functions that take inputs and return outputs with no side
+                  effects (no DB, no files, no network). The transformation
+                  functions &mdash; <code>cast_data_type</code>,
+                  <code>rename_column</code>, <code>drop_na</code>.
+                </p>
+                <p>
+                  <strong>Method:</strong> hand them data, assert on the result.
+                  No fixtures, no client. Test many cases &mdash; they are cheap.
+                  See <code>test_transformations.py</code>.
+                </p>
+              </div>
+              <div class="mini-card">
+                <h3>API endpoints &rarr; integration tests</h3>
+                <p>
+                  The routes &mdash; <code>POST /projects/upload</code>,
+                  <code>GET /projects/recent</code>. Here you care about the
+                  HTTP contract, not internal details.
+                </p>
+                <p>
+                  <strong>Method:</strong> use <code>TestClient</code> to send a
+                  request; assert on the <em>status code</em>, the
+                  <em>response body</em>, and any <em>headers</em> (e.g. the
+                  auth cookie).
+                </p>
+              </div>
+              <div class="mini-card">
+                <h3>Database code &rarr; integration tests</h3>
+                <p>
+                  Functions that read or write rows &mdash;
+                  <code>create_project</code>, <code>create_checkpoint</code>.
+                  A mismatch with the real schema only shows up against a real
+                  database.
+                </p>
+                <p>
+                  <strong>Method:</strong> use the <code>db</code> fixture
+                  (throwaway SQLite), call the function, then query the database
+                  back and assert the row is as expected.
+                </p>
+              </div>
+              <div class="mini-card">
+                <h3>Auth &amp; ownership &rarr; negative tests</h3>
+                <p>
+                  Security code is defined by what it <em>refuses</em>. Testing
+                  only the success case proves nothing.
+                </p>
+                <p>
+                  <strong>Method:</strong> test every state &mdash; logged in,
+                  logged out (<code>401</code>), and "logged in as the wrong
+                  user" (<code>404</code>). See <code>TestOwnership</code> in
+                  <code>test_auth.py</code>.
+                </p>
+              </div>
+            </div>
+
+            <h3>API testing in more depth</h3>
+            <p>
+              Since the backend is mostly an API, API tests carry a lot of
+              weight. For any endpoint, walk this checklist:
+            </p>
+            <table>
+              <thead>
+                <tr><th>Check</th><th>Example assertion</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Correct status code on success</td>
+                  <td><code>assert resp.status_code == 201</code></td>
+                </tr>
+                <tr>
+                  <td>Response body has the right shape / values</td>
+                  <td><code>assert resp.json()["email"] == "newuser@test.com"</code></td>
+                </tr>
+                <tr>
+                  <td>Secrets are <em>not</em> leaked</td>
+                  <td><code>assert "password_hash" not in resp.json()</code></td>
+                </tr>
+                <tr>
+                  <td>Bad input is rejected with the right code</td>
+                  <td><code>assert resp.status_code == 422</code> (invalid email)</td>
+                </tr>
+                <tr>
+                  <td>Duplicate / conflict handled</td>
+                  <td><code>assert resp.status_code == 409</code> (email taken)</td>
+                </tr>
+                <tr>
+                  <td>Auth is enforced</td>
+                  <td><code>assert resp.status_code == 401</code> (no cookie)</td>
+                </tr>
+                <tr>
+                  <td>You cannot reach another user's data</td>
+                  <td><code>assert resp.status_code == 404</code> (not the owner)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Regression tests &rarr; lock in a fix</h3>
+            <p>
+              When a bug is found, the durable fix has two parts: correct the
+              code, <em>and</em> write a test that would have caught it. That
+              test is a regression test. <code>test_save_project.py</code> is a
+              good example &mdash; a past concern was that saving a project might
+              overwrite the original uploaded file, so the test uploads, saves
+              repeatedly, and asserts the original file's contents are
+              byte-for-byte unchanged. The bug now cannot return unnoticed.
+            </p>
+          </section>
+
+          <section id="frontend">
+            <h2>9. Frontend Component Tests</h2>
+            <p>
+              Frontend tests use the same core idea as backend tests &mdash; run
+              code, check the result &mdash; but the question changes. Backend
+              tests usually ask: "given this input, did the function, API, or
+              database flow produce the right output?" Frontend component tests
+              ask: <strong>"given this screen state, can the user see the right
+              thing, do the right action, and get the right result?"</strong>
+            </p>
+            <p>
+              The mental shift is simple and important:
+              <strong>test behaviour, not implementation</strong>. Do not test
+              whether a component uses <code>useState</code>, what its internal
+              variable is called, or which helper function it calls. Test the
+              promise the component makes to the user or to its parent.
+            </p>
+
+            <h3>What a component test checks</h3>
+            <table>
+              <thead>
+                <tr><th>Question</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Does it render the right thing?</td>
+                  <td>A button with text <code>Save</code> appears as a real button.</td>
+                </tr>
+                <tr>
+                  <td>Does it respond to user actions?</td>
+                  <td>Clicking <code>Save</code> calls the <code>onClick</code> handler.</td>
+                </tr>
+                <tr>
+                  <td>Does it handle states?</td>
+                  <td>Loading, empty, error, disabled, selected, open, closed.</td>
+                </tr>
+                <tr>
+                  <td>Is it accessible enough to find like a user would?</td>
+                  <td>Find buttons by role, inputs by label, dialogs by role.</td>
+                </tr>
+                <tr>
+                  <td>Does it notify the parent correctly?</td>
+                  <td>A form calls <code>onSubmit</code> with the values the user typed.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>The frontend testing stack</h3>
+            <p>
+              These frontend examples use <strong>Vitest</strong>,
+              <strong>React Testing Library</strong>,
+              <strong>@testing-library/user-event</strong>, and
+              <strong>jsdom</strong>. Vitest runs the tests. jsdom gives the test
+              a fake browser-like DOM. React Testing Library renders components
+              into that DOM. <code>user-event</code> simulates realistic clicks,
+              typing, keyboard presses, and other user actions.
+            </p>
+
+            <h3>The thought process</h3>
+            <ol>
+              <li>
+                <strong>What is this component responsible for?</strong> A
+                button should render, support disabled state, and call
+                <code>onClick</code>. A modal should appear when open, disappear
+                when closed, expose a dialog role, and close through supported
+                interactions.
+              </li>
+              <li>
+                <strong>What can the user observe?</strong> Prefer
+                <code>screen.getByRole("dialog")</code> over checking an
+                internal <code>isOpen</code> state value.
+              </li>
+              <li>
+                <strong>What can the user do?</strong> Use realistic actions:
+                click the button, type into the input, press Escape.
+              </li>
+              <li>
+                <strong>What outcome matters?</strong> Did text appear? Did the
+                button become disabled? Did validation show? Was the callback
+                called with the right value?
+              </li>
+            </ol>
+
+            <div class="rule">
+              <span class="label">Frontend rule</span>
+              If the user could not see it, click it, type into it, focus it, or
+              experience its result, be suspicious of testing it directly.
+            </div>
+
+            <h3>A realistic component example</h3>
+            <p>
+              <code>frontend/src/Components/common/__tests__/Button.test.jsx</code>
+              tests the reusable <code>Button</code> component. The most
+              important test is not about Tailwind classes; it is about the
+              user's action and the component's contract:
+            </p>
+            <pre>import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import Button from "../Button";
+
+it("calls onClick handler when clicked", async () =&gt; {
+  const user = userEvent.setup();
+  const handleClick = vi.fn();
+
+  render(&lt;Button onClick={handleClick}&gt;Click&lt;/Button&gt;);
+
+  await user.click(screen.getByRole("button"));
+
+  expect(handleClick).toHaveBeenCalledOnce();
+});</pre>
+            <p>
+              Read that test as a sentence: render a button, click it like a
+              user, and expect the click handler to run once. It does not care
+              how the component is implemented internally.
+            </p>
+
+            <h3>Bad vs good assertions</h3>
+            <p>
+              A brittle frontend test reaches into implementation details:
+            </p>
+            <pre>expect(container.querySelector(".submit-button")).not.toBeNull();</pre>
+            <p>
+              A stronger test asks for the element the way a user or assistive
+              technology would understand it:
+            </p>
+            <pre>expect(screen.getByRole("button", { name: /submit/i })).toBeEnabled();</pre>
+
+            <h3>Common component checklists</h3>
+            <div class="two-col">
+              <div class="mini-card">
+                <h3>Form</h3>
+                <p>
+                  Renders fields, accepts input, shows validation errors,
+                  disables invalid submit, and calls <code>onSubmit</code> with
+                  the right values.
+                </p>
+              </div>
+              <div class="mini-card">
+                <h3>Modal</h3>
+                <p>
+                  Renders only when open, exposes <code>role="dialog"</code>,
+                  shows the right content, closes from the close button, and
+                  closes on Escape if that is part of the contract.
+                </p>
+              </div>
+              <div class="mini-card">
+                <h3>List or table</h3>
+                <p>
+                  Shows rows accurately, handles loading, empty, and error
+                  states, and supports any visible sorting, filtering, or
+                  pagination controls.
+                </p>
+              </div>
+              <div class="mini-card">
+                <h3>Dropdown or menu</h3>
+                <p>
+                  Opens on the expected action, shows options, selects the right
+                  option, closes afterward, and handles keyboard behaviour when
+                  important.
+                </p>
+              </div>
+            </div>
+
+            <h3>Where E2E and visual tests fit</h3>
+            <p>
+              Component tests are not the whole frontend story. Use
+              <strong>end-to-end tests</strong> when the important behaviour is a
+              full user journey across routing, frontend, backend, and database
+              &mdash; for example upload a CSV, transform it, save it, and reopen
+              it. Use <strong>visual regression tests</strong> when the main risk
+              is layout or appearance changing unexpectedly, especially for
+              dashboards, tables, charts, and shared design-system components.
+            </p>
+          </section>
+
+          <section id="industry">
+            <h2>10. Industry-Standard Examples</h2>
+            <p>
+              The patterns below are adapted from common tool documentation and
+              production testing practice. Treat them as examples of the shape of
+              a good test, not code you must paste exactly into any one project.
+            </p>
+
+            <h3>Vitest: small deterministic logic</h3>
+            <p>
+              Vitest's basic model is the same as pytest: define a named test,
+              run code, and assert the result. This style is ideal for helpers,
+              validators, formatters, and transformation logic.
+            </p>
+            <pre>import { expect, test } from "vitest";
+
+function formatColumnName(value) {
+  return value.trim().toLowerCase().replaceAll(" ", "_");
+}
+
+test("formats a column name for API payloads", () =&gt; {
+  expect(formatColumnName(" Total Sales ")).toBe("total_sales");
+});</pre>
+            <p>
+              Notice the properties of this test: no DOM, no network, no app
+              provider, no database. If the logic is pure, keep the test pure.
+            </p>
+
+            <h3>React Testing Library: accessible component behaviour</h3>
+            <p>
+              Testing Library pushes you toward queries that match how users and
+              assistive technology understand the page. For example,
+              <code>getByRole("button", { name: /save/i })</code> is stronger
+              than searching for a CSS class because it verifies that a real
+              accessible button exists.
+            </p>
+            <pre>import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+function RenameColumnForm({ onSubmit }) {
+  return (
+    &lt;form
+      onSubmit={(event) =&gt; {
+        event.preventDefault();
+        const form = new FormData(event.currentTarget);
+        onSubmit(form.get("name"));
+      }}
+    &gt;
+      &lt;label&gt;
+        New column name
+        &lt;input name="name" /&gt;
+      &lt;/label&gt;
+      &lt;button type="submit"&gt;Save&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}
+
+test("submits the typed column name", async () =&gt; {
+  const user = userEvent.setup();
+  const onSubmit = vi.fn();
+
+  render(&lt;RenameColumnForm onSubmit={onSubmit} /&gt;);
+
+  await user.type(screen.getByLabelText(/new column name/i), "Revenue");
+  await user.click(screen.getByRole("button", { name: /save/i }));
+
+  expect(onSubmit).toHaveBeenCalledWith("Revenue");
+});</pre>
+            <p>
+              This test has the right shape: render the component, perform real
+              user actions, and assert the observable contract.
+            </p>
+
+            <h3>Playwright: full browser journey</h3>
+            <p>
+              Playwright tests run in a real browser. They are useful when a bug
+              could involve routing, browser APIs, network calls, storage,
+              authentication, or multiple screens. Playwright's locators also use
+              user-facing queries such as role and accessible name.
+            </p>
+            <p>
+              The basic syntax is always the same:
+            </p>
+            <pre>import { test, expect } from "./fixtures.js";
+
+test("plain-English behaviour name", async ({ page, projectId }) =&gt; {
+  // Arrange: navigate or use a fixture-created project.
+  await page.goto(`/projects/${projectId}`);
+
+  // Act: do one user-visible action.
+  await page.getByRole("button", { name: /save checkpoint/i }).click();
+
+  // Assert: wait for the user-visible result.
+  await expect(page.getByText(/checkpoint saved/i)).toBeVisible();
+});</pre>
+            <p>
+              This should not replace smaller tests. It proves that the real
+              workflow hangs together; it does not need to cover every edge case
+              of CSV parsing.
+            </p>
+
+            <h3>Playwright fixtures: what <code>{ page, projectId }</code> means</h3>
+            <p>
+              The argument object passed to a test contains fixtures.
+              <code>page</code> is the browser tab. A custom
+              <code>fixtures.js</code> file can also provide values such as
+              <code>projectId</code>, which means the test starts with an
+              authenticated user and a real sample project already created.
+              Use those fixtures instead of repeating sign-up, upload, and setup
+              steps inside every test.
+            </p>
+            <pre>test("renames a column", async ({ page, projectId }) =&gt; {
+  await page.goto(`/projects/${projectId}`);
+  // test starts from a real uploaded project, not an empty app
+});</pre>
+
+            <h3>Locator syntax: how to find elements</h3>
+            <p>
+              A <strong>locator</strong> is Playwright's handle for an element.
+              Locators auto-wait before actions and assertions, which is why
+              they are better than manually sleeping. Pick the selector that
+              describes how a user understands the control:
+            </p>
+            <table>
+              <thead>
+                <tr><th>Best when...</th><th>Use this</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>The element is a button, link, menu item, heading, table, cell, etc.</td>
+                  <td><code>getByRole</code></td>
+                  <td><code>page.getByRole("button", { name: /export/i })</code></td>
+                </tr>
+                <tr>
+                  <td>An input has a visible label.</td>
+                  <td><code>getByLabel</code></td>
+                  <td><code>page.getByLabel(/email/i).fill("a@b.com")</code></td>
+                </tr>
+                <tr>
+                  <td>You need visible text that is not a button label.</td>
+                  <td><code>getByText</code></td>
+                  <td><code>page.getByText(/project saved/i)</code></td>
+                </tr>
+                <tr>
+                  <td>The element has a placeholder and no better label.</td>
+                  <td><code>getByPlaceholder</code></td>
+                  <td><code>page.getByPlaceholder(/search/i).fill("age")</code></td>
+                </tr>
+                <tr>
+                  <td>The UI text is unstable, duplicated, icon-only, or hidden in a custom control.</td>
+                  <td><code>locator('[data-testid="..."]')</code></td>
+                  <td><code>page.locator('[data-testid="toolbar-export"]')</code></td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              Avoid selectors like <code>.blue-button</code>,
+              <code>div:nth-child(3)</code>, or long DOM chains. They test the
+              page's implementation instead of the user's behaviour and break
+              during harmless refactors.
+            </p>
+
+            <h3>Common Playwright actions and assertions</h3>
+            <pre>// Navigate
+await page.goto("/");
+await page.goto(`/projects/${projectId}`);
+
+// Click
+await page.getByRole("button", { name: /export/i }).click();
+
+// Type into inputs
+await page.getByLabel(/project name/i).fill("Sales cleanup");
+await page.getByLabel(/project name/i).press("Enter");
+
+// Upload a file
+await page.getByLabel(/csv file/i).setInputFiles("e2e/fixtures/sample.csv");
+
+// Assert visible UI
+await expect(page.getByRole("heading", { name: /sales cleanup/i })).toBeVisible();
+await expect(page.getByText(/failed to export/i)).not.toBeVisible();
+
+// Assert attributes or state
+await expect(page.locator('[data-testid="export-format-csv"]'))
+  .toHaveAttribute("aria-pressed", "true");</pre>
+
+            <h3>Waiting: do not sleep</h3>
+            <p>
+              Good E2E tests wait for real signals. Do not use
+              <code>waitForTimeout(1000)</code> unless you are debugging. It
+              makes tests slow and still flaky. Instead, wait for the element,
+              URL, response, or download that proves the app moved forward.
+            </p>
+            <pre>// Good: waits until the UI is actually ready
+await expect(page.getByRole("table")).toBeVisible();
+await expect(page).toHaveURL(/\/projects\/[a-f0-9-]+/);
+
+// Good: wait for a specific control before clicking
+await page.locator('[data-testid="toolbar-export"]').waitFor({ state: "visible" });
+await page.locator('[data-testid="toolbar-export"]').click();
+
+// Bad: guesses that one second is enough
+await page.waitForTimeout(1000);</pre>
+
+            <h3>Downloads, dialogs, and other event races</h3>
+            <p>
+              Browser events can happen immediately after a click. Create the
+              promise <em>before</em> the click that triggers the event. In a
+              typical export flow, clicking the toolbar button opens a
+              modal; the download does not happen until the modal's Export
+              button is clicked.
+            </p>
+            <pre>test("export downloads a valid CSV file", async ({ page, projectId }) =&gt; {
+  await page.goto(`/projects/${projectId}`);
+
+  await page.locator('[data-testid="toolbar-export"]').click();
+  await expect(page.locator('[data-testid="export-filename"]')).toBeVisible();
+  await expect(page.locator('[data-testid="export-format-csv"]'))
+    .toHaveAttribute("aria-pressed", "true");
+
+  const downloadPromise = page.waitForEvent("download", { timeout: 15_000 });
+  await page.locator('[data-testid="export-confirm"]').click();
+  const download = await downloadPromise;
+
+  expect(download.suggestedFilename().toLowerCase()).toMatch(/\.csv$/);
+});</pre>
+
+            <h3>What makes a good E2E test</h3>
+            <ul>
+              <li><strong>It covers a real user journey.</strong> Good: upload CSV, apply transform, export result. Too small for E2E: pure CSV parsing.</li>
+              <li><strong>It has one main behaviour.</strong> A test named "export downloads a valid CSV file" should not also test checkpoint revert and column rename.</li>
+              <li><strong>It uses stable locators.</strong> Prefer role, label, text, then <code>data-testid</code>. Avoid CSS classes and DOM position.</li>
+              <li><strong>It waits for outcomes, not time.</strong> Use <code>expect(...).toBeVisible()</code>, <code>toHaveURL()</code>, <code>waitForEvent()</code>, or a response wait.</li>
+              <li><strong>It stays independent.</strong> Do not rely on another test running first. Use fixtures to create the project or user state you need.</li>
+              <li><strong>It asserts what matters.</strong> Check the downloaded CSV header/content, not that a specific internal React state changed.</li>
+            </ul>
+
+            <h3>Cypress: selectors and realistic app testing</h3>
+            <p>
+              Cypress's public guidance emphasizes realistic app testing,
+              independent tests, and stable selectors. For E2E tests, a dedicated
+              <code>data-testid</code> or Testing Library query is usually more
+              stable than selecting by styling classes.
+            </p>
+            <pre>describe("project list", () =&gt; {
+  it("opens an existing project", () =&gt; {
+    cy.visit("/");
+
+    cy.findByRole("link", { name: /recent projects/i }).click();
+    cy.findByRole("button", { name: /sales cleanup/i }).click();
+
+    cy.findByRole("heading", { name: /sales cleanup/i }).should("be.visible");
+  });
+});</pre>
+
+            <h3>Async UI: wait for the user-visible result</h3>
+            <p>
+              Async tests should wait for the thing the user sees, not for an
+              arbitrary timeout. In component tests, that usually means
+              <code>findBy...</code>. In Playwright, it usually means an
+              auto-waiting assertion such as <code>toBeVisible()</code>.
+            </p>
+            <pre>// Component test
+expect(await screen.findByText(/project saved/i)).toBeInTheDocument();
+
+// Browser test
+await expect(page.getByText(/project saved/i)).toBeVisible();</pre>
+
+            <h3>External references</h3>
+            <ul>
+              <li>
+                <a href="https://main.vitest.dev/guide/learn/writing-tests">Vitest: Writing Tests</a>
+                &mdash; named tests and assertions.
+              </li>
+              <li>
+                <a href="https://testing-library.com/docs/queries/byrole/">Testing Library: ByRole</a>
+                &mdash; querying UI by accessible role and name.
+              </li>
+              <li>
+                <a href="https://testing-library.com/docs/dom-testing-library/api-events/">Testing Library: Firing Events</a>
+                &mdash; why <code>user-event</code> is usually preferred for user interactions.
+              </li>
+              <li>
+                <a href="https://playwright.dev/docs/next/writing-tests">Playwright: Writing Tests</a>
+                &mdash; browser navigation, locators, actions, assertions, and isolation.
+              </li>
+              <li>
+                <a href="https://docs.cypress.io/app/core-concepts/best-practices">Cypress: Best Practices</a>
+                &mdash; scalable E2E testing patterns and selector guidance.
+              </li>
+            </ul>
+          </section>
+
+          <section id="thinking">
+            <h2>11. The Thought Process</h2>
+            <p>
+              Tools aside, the real skill is deciding <em>what</em> to test. When
+              you write or change a function, ask three questions.
+            </p>
+
+            <h3>1. What is the happy path?</h3>
+            <p>
+              The ordinary, everything-valid case. Sign up with a good email and
+              password &rarr; expect <code>201</code> and a cookie. This is the
+              first test &mdash; if the normal case is broken, nothing else
+              matters.
+            </p>
+
+            <h3>2. What are the edge cases?</h3>
+            <p>
+              The boundaries and unusual-but-legal inputs. For a password length
+              rule of 8&ndash;72 bytes: test 7 (too short), test 73 (too long),
+              and ideally the exact boundaries. Bugs cluster at boundaries &mdash;
+              that is where <code>&lt;</code> versus <code>&lt;=</code> mistakes
+              hide.
+            </p>
+
+            <h3>3. What are the failure cases?</h3>
+            <p>
+              The things that <em>should</em> go wrong, and must fail cleanly.
+              Duplicate email &rarr; <code>409</code>. No auth cookie &rarr;
+              <code>401</code>. Wrong owner &rarr; <code>404</code>. A function
+              that only works when given perfect input is not finished, and the
+              failure tests are what prove the other half.
+            </p>
+
+            <div class="rule">
+              <span class="label">One behaviour per test</span>
+              Each test should check a single behaviour and its name should say
+              which. When it fails, the name alone points at the problem. A test
+              that asserts ten unrelated things just tells you "something, somewhere".
+            </div>
+
+            <h3>Test behaviour, not implementation</h3>
+            <p>
+              Assert on <em>what</em> a function produces, not <em>how</em>. A
+              test tied to internal details breaks every time you refactor &mdash;
+              even when behaviour is unchanged &mdash; which trains people to
+              ignore failures. Check the observable result.
+            </p>
+
+            <h3>Write the failing test first</h3>
+            <p>
+              When fixing a bug, it is worth writing the test <em>before</em> the
+              fix. Watch it fail &mdash; that proves the test actually exercises
+              the bug. Then fix the code and watch it pass. If you write the test
+              after, you never confirmed it could catch anything. (Doing this for
+              all code, not just bugfixes, is called <strong>test-driven
+              development</strong> &mdash; optional, but the "see it fail first"
+              habit is gold.)
+            </p>
+
+            <h3>What not to test</h3>
+            <ul>
+              <li>
+                <strong>Other people's code.</strong> You do not test that
+                FastAPI routes requests or that pandas adds numbers &mdash; that
+                is their job. Test <em>your</em> logic.
+              </li>
+              <li>
+                <strong>Trivial code.</strong> A one-line getter with no logic
+                has nothing to verify.
+              </li>
+              <li>
+                <strong>Everything at once.</strong> 100% coverage is rarely
+                worth the effort. Aim tests at logic that is complex, important,
+                or easy to get wrong &mdash; auth, transformations, money-like
+                invariants.
+              </li>
+            </ul>
+          </section>
+
+          <section id="running">
+            <h2>12. Running the Tests</h2>
+            <p>
+              Backend commands often run from the <code>backend/</code>
+              directory. Frontend commands run from the
+              <code>frontend/</code> directory. E2E commands run from
+              the repository root because <code>playwright.config.js</code> is
+              there.
+            </p>
+
+            <h3>Run the backend suite</h3>
+            <pre>uv run pytest</pre>
+            <p>
+              <code>uv run</code> executes the command inside the project's
+              virtual environment, so the right Python and packages are used.
+            </p>
+
+            <h3>Run the frontend suite</h3>
+            <pre>npm run test</pre>
+            <p>
+              This runs <code>vitest run</code>, which executes the React and
+              JavaScript tests once and exits. The frontend test setup lives in
+              <code>frontend/src/test/setup.js</code>, where
+              <code>@testing-library/jest-dom</code> adds useful assertions like
+              <code>toBeInTheDocument()</code> and <code>toBeDisabled()</code>.
+            </p>
+
+            <h3>Run the E2E suite</h3>
+            <pre>npm run test:e2e</pre>
+            <p>
+              This runs Playwright from the repo root. Playwright starts the
+              backend and frontend dev servers from <code>playwright.config.js</code>.
+              The backend needs Postgres. If your local database is the Docker
+              Compose one, run:
+            </p>
+            <pre>DATABASE_URL=postgresql://postgres:postgres@localhost:5432/example_app npm run test:e2e</pre>
+
+            <h3>Useful backend variations</h3>
+            <pre># Quiet output (one character per test)
+uv run pytest -q
+
+# Run a single file
+uv run pytest tests/test_auth.py
+
+# Run a single test class or function
+uv run pytest tests/test_auth.py::TestSignup
+uv run pytest tests/test_auth.py::TestSignup::test_signup_success_sets_cookie
+
+# Stop at the first failure
+uv run pytest -x
+
+# Show print() output and full detail
+uv run pytest -s -v</pre>
+
+            <h3>Useful frontend variations</h3>
+            <pre># Run one test file
+npx vitest run src/Components/common/__tests__/Button.test.jsx
+
+# Run tests whose name matches a pattern
+npx vitest run -t "calls onClick"
+
+# Run in watch mode while developing
+npx vitest</pre>
+
+            <h3>Useful E2E variations</h3>
+            <pre># Run one E2E file
+npm run test:e2e -- e2e/export.spec.js
+
+# Run tests whose name matches a pattern
+npx playwright test -g "export downloads"
+
+# Run headed so you can see the browser
+npm run test:e2e:headed
+
+# Debug one file interactively
+npm run test:e2e:debug -- e2e/export.spec.js</pre>
+
+            <h3>Reading the result</h3>
+            <p>The last line is usually the summary. Green is the goal:</p>
+            <pre>177 passed, 2 failed, 128 warnings in 5.79s</pre>
+            <ul>
+              <li><strong>passed</strong> &mdash; these behaviours are confirmed working.</li>
+              <li><strong>failed</strong> &mdash; pytest prints, for each, the file, line, and the exact <code>assert</code> that did not hold. Start there.</li>
+              <li><strong>warnings</strong> &mdash; not failures; usually deprecations worth cleaning up eventually.</li>
+            </ul>
+            <p>
+              A failure block shows the comparison directly &mdash; e.g.
+              <code>assert 401 == 404</code> means the code returned
+              <code>401</code> where the test expected <code>404</code>. That one
+              line is usually enough to start debugging. Vitest failures look
+              similar: they name the failing file and test, then show the
+              expected value versus the received value.
+            </p>
+
+            <div class="note">
+              <span class="label">Tests are not the only check</span>
+              Alongside tests, the repo uses linters and formatters:
+              <strong>ruff</strong> for Python, and ESLint / Prettier for the
+              frontend. Tests check that the code is <em>correct</em>; linting
+              and formatting check that it is <em>clean and consistent</em>.
+              Both should be green before code is considered done.
+            </div>
+            <div class="warning">
+              <span class="label">Green is not "bug-free"</span>
+              A passing suite means "every behaviour I thought to check still
+              works". It cannot vouch for cases nobody wrote a test for. Tests
+              raise your confidence; they never make it absolute.
+            </div>
+          </section>
+
+          <section id="cheatsheet">
+            <h2>13. Glossary &amp; Cheatsheet</h2>
+
+            <h3>Terms</h3>
+            <table>
+              <thead>
+                <tr><th>Term</th><th>Meaning</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Test</td><td>Code that runs your code and asserts the result is correct.</td></tr>
+                <tr><td>Assertion</td><td>An <code>assert</code> statement &mdash; the actual check. False &rarr; the test fails.</td></tr>
+                <tr><td>Unit test</td><td>Tests one function in isolation. Fast.</td></tr>
+                <tr><td>Integration test</td><td>Tests several components working together (endpoint + DB + service).</td></tr>
+                <tr><td>Component test</td><td>Renders a frontend component and checks what the user can see or do.</td></tr>
+                <tr><td>End-to-end (E2E)</td><td>Tests the whole system as a user would.</td></tr>
+                <tr><td>Visual regression test</td><td>Compares screenshots or rendered output to catch unexpected UI changes.</td></tr>
+                <tr><td>Regression</td><td>A bug that comes back after being fixed. A regression test stops that.</td></tr>
+                <tr><td>Static check</td><td>A non-runtime check such as TypeScript, linting, or formatting.</td></tr>
+                <tr><td>Fixture</td><td>Reusable setup, defined in <code>conftest.py</code>, requested by naming it as an argument.</td></tr>
+                <tr><td>Autouse fixture</td><td>A fixture that runs for every test automatically.</td></tr>
+                <tr><td>Test isolation</td><td>Each test starts clean and does not affect any other.</td></tr>
+                <tr><td>Mock / fake</td><td>A stand-in for a real dependency (e.g. SQLite standing in for Postgres).</td></tr>
+                <tr><td>Locator</td><td>A browser-test handle for finding an element, preferably by role, label, text, or test id.</td></tr>
+                <tr><td>jsdom</td><td>A browser-like DOM environment used by frontend tests without opening a real browser.</td></tr>
+                <tr><td>React Testing Library</td><td>Tools for rendering React components and finding elements by user-facing queries.</td></tr>
+                <tr><td>user-event</td><td>A Testing Library helper for realistic typing, clicking, and keyboard interactions.</td></tr>
+                <tr><td>Coverage</td><td>How much of the code the tests exercise. A guide, not a goal in itself.</td></tr>
+                <tr><td>Happy path</td><td>The everything-valid scenario.</td></tr>
+                <tr><td>Arrange&ndash;Act&ndash;Assert</td><td>The three-step shape of a well-written test.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Common HTTP status codes in our API tests</h3>
+            <table>
+              <thead>
+                <tr><th>Code</th><th>Means</th><th>Typical test</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>200</code></td><td>OK</td><td>Successful read/action.</td></tr>
+                <tr><td><code>201</code></td><td>Created</td><td>Sign-up created a user.</td></tr>
+                <tr><td><code>401</code></td><td>Unauthorized</td><td>No / invalid auth cookie.</td></tr>
+                <tr><td><code>404</code></td><td>Not Found</td><td>Missing &mdash; or owned by another user.</td></tr>
+                <tr><td><code>409</code></td><td>Conflict</td><td>Email already registered.</td></tr>
+                <tr><td><code>422</code></td><td>Unprocessable</td><td>Input failed validation (bad email, short password).</td></tr>
+              </tbody>
+            </table>
+
+            <h3>When you add a feature, write tests for&hellip;</h3>
+            <ul>
+              <li>the happy path &mdash; valid input, expected output;</li>
+              <li>each edge case &mdash; boundaries, empty values, unusual-but-legal input;</li>
+              <li>each failure case &mdash; bad input, missing auth, wrong owner;</li>
+              <li>and, if you fixed a bug, one regression test that fails without your fix.</li>
+            </ul>
+
+            <p class="footer">
+              Written as an interview-ready guide to common test suites:
+              backend tests with pytest, FastAPI TestClient, and SQLite;
+              frontend tests with Vitest, React Testing Library, user-event, and
+              jsdom. Pair it with real files such as
+              <code>backend/tests/</code> and
+              <code>frontend/src/**/__tests__/</code> &mdash; reading real tests
+              is the fastest way to learn.
+            </p>
+          </section>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
